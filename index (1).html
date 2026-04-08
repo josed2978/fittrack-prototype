@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FitTrack — Interactive Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--red:#E74C3C;--orange:#FF6B57;--dark:#1E1F23;--dark2:#2A2B30;--white:#FFFFFF;--gray1:#F5F5F5;--gray2:#E8E8E8;--gray3:#AAAAAA;--gray4:#666666;--green:#27AE60;--font:'Poppins',sans-serif;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0d0e11;font-family:var(--font);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:24px 16px 60px;color:var(--white);}
+.site-header{width:100%;max-width:900px;display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;padding:0 8px;}
+.site-logo{display:flex;align-items:center;gap:10px;font-size:1.5rem;font-weight:900;background:linear-gradient(135deg,var(--red),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.site-sub{font-size:0.7rem;color:var(--gray3);text-align:right;line-height:1.6;}
+.tabs{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin-bottom:28px;max-width:900px;width:100%;}
+.tab{padding:6px 14px;border-radius:20px;border:1.5px solid #2a2b30;background:#1a1b1f;color:var(--gray3);font-family:var(--font);font-size:0.7rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.tab:hover{border-color:var(--red);color:var(--white);}
+.tab.active{background:var(--red);border-color:var(--red);color:var(--white);}
+.layout{display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap;justify-content:center;width:100%;max-width:900px;}
+.phone{width:390px;background:#111;border-radius:48px;border:3px solid #2a2b2f;box-shadow:0 40px 80px rgba(0,0,0,0.7),inset 0 1px 0 rgba(255,255,255,0.06);position:relative;overflow:hidden;flex-shrink:0;}
+.sbar{height:48px;background:var(--dark);display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:0.72rem;font-weight:700;color:var(--white);position:relative;}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:126px;height:34px;background:#000;border-radius:0 0 20px 20px;}
+.swrap{height:740px;overflow-y:auto;scrollbar-width:none;}
+.swrap::-webkit-scrollbar{display:none;}
+.bnav{height:72px;background:var(--white);border-top:1px solid var(--gray2);display:flex;align-items:center;justify-content:space-around;padding:0 4px 10px;}
+.nbtn{display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer;padding:6px 10px;border-radius:12px;font-family:var(--font);}
+.nbtn .ni{font-size:1.25rem;}
+.nbtn .nl{font-size:0.58rem;font-weight:700;color:var(--gray3);}
+.nbtn.active .nl{color:var(--red);}
+.screen{display:none;}
+.screen.active{display:block;}
+/* shared */
+.dh{background:var(--dark);padding:16px 20px 14px;color:var(--white);}
+.dh h2{font-size:1.1rem;font-weight:800;}
+.dh p{font-size:0.74rem;color:var(--gray3);margin-top:2px;}
+.sl{font-size:0.78rem;font-weight:700;color:var(--dark);padding:14px 18px 4px;}
+.card{background:var(--white);border-radius:16px;margin:8px 16px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,0.07);}
+.btnr{display:block;width:calc(100% - 32px);margin:8px 16px;background:linear-gradient(135deg,var(--red),var(--orange));color:var(--white);border:none;border-radius:14px;padding:14px;font-family:var(--font);font-size:0.9rem;font-weight:800;cursor:pointer;}
+.btnd{display:block;width:calc(100% - 32px);margin:8px 16px;background:var(--dark);color:var(--white);border:none;border-radius:14px;padding:14px;font-family:var(--font);font-size:0.88rem;font-weight:700;cursor:pointer;}
+.btno{display:block;width:calc(100% - 32px);margin:8px 16px;background:var(--gray1);color:var(--dark);border:1.5px solid var(--gray2);border-radius:14px;padding:12px;font-family:var(--font);font-size:0.86rem;font-weight:600;cursor:pointer;}
+/* login */
+#s-login{background:var(--dark);}
+.lbg{background:linear-gradient(170deg,#1a1b1f,#2a1a1a,#1E1F23);padding:56px 28px 28px;text-align:center;}
+.llogo{width:76px;height:76px;background:linear-gradient(135deg,var(--red),var(--orange));border-radius:22px;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;font-size:2.1rem;box-shadow:0 12px 30px rgba(231,76,60,0.45);}
+.lbg h1{font-size:1.9rem;font-weight:900;color:var(--white);}
+.lbg p{font-size:0.8rem;color:var(--gray3);margin-top:6px;}
+.lform{background:var(--gray1);padding:22px 20px 8px;}
+.fl{font-size:0.68rem;font-weight:700;color:var(--gray4);letter-spacing:0.5px;margin-bottom:5px;}
+.fi{width:100%;padding:12px 16px;background:var(--white);border:1.5px solid var(--gray2);border-radius:12px;font-family:var(--font);font-size:0.86rem;color:var(--dark);outline:none;}
+.fi:focus{border-color:var(--red);}
+.fmb{margin-bottom:12px;}
+.fgt{text-align:right;margin-bottom:4px;font-size:0.7rem;color:var(--red);cursor:pointer;font-weight:700;}
+.div{display:flex;align-items:center;gap:10px;margin:12px 20px;color:var(--gray3);font-size:0.74rem;}
+.div::before,.div::after{content:'';flex:1;height:1px;background:var(--gray2);}
+.socl{display:flex;gap:8px;margin:0 20px 12px;}
+.sb{flex:1;padding:10px;border:1.5px solid var(--gray2);border-radius:12px;background:var(--white);font-family:var(--font);font-size:0.78rem;font-weight:600;cursor:pointer;}
+.noacc{text-align:center;font-size:0.7rem;color:var(--gray3);padding:0 20px 16px;}
+.noacc a{color:var(--red);font-weight:700;cursor:pointer;}
+/* onboarding */
+.obh{background:linear-gradient(160deg,var(--dark),var(--dark2));padding:30px 24px 22px;text-align:center;color:var(--white);}
+.obico{width:70px;height:70px;background:linear-gradient(135deg,var(--red),var(--orange));border-radius:20px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:2rem;box-shadow:0 8px 24px rgba(231,76,60,0.4);}
+.obh h1{font-size:1.7rem;font-weight:900;}
+.obh p{font-size:0.78rem;color:var(--gray3);margin-top:6px;}
+.obf{background:var(--gray1);padding:18px 20px 4px;}
+/* dashboard */
+.dtop{background:linear-gradient(160deg,var(--dark),#252629);padding:16px 20px 20px;color:var(--white);}
+.dgr h2{font-size:1.1rem;font-weight:800;}
+.dgr p{font-size:0.72rem;color:var(--gray3);margin-top:2px;}
+.rrow{display:flex;align-items:center;gap:16px;margin-top:16px;}
+.rw{position:relative;width:86px;height:86px;flex-shrink:0;}
+.rw svg{transform:rotate(-90deg);}
+.ri{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+.rp{font-size:1.1rem;font-weight:900;color:var(--red);}
+.rs{font-size:0.56rem;color:var(--gray3);}
+.ss{flex:1;}
+.ss p{font-size:0.7rem;color:var(--gray3);margin-bottom:7px;}
+.sc{display:flex;gap:6px;}
+.sch{flex:1;background:rgba(255,255,255,0.08);border-radius:10px;padding:7px 4px;text-align:center;}
+.sch .sv{font-size:1rem;font-weight:900;color:var(--red);}
+.sch .sl2{font-size:0.56rem;color:var(--gray3);}
+.qg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 16px 4px;}
+.qb{background:var(--white);border-radius:13px;padding:11px 4px;text-align:center;cursor:pointer;border:1.5px solid var(--gray2);transition:all 0.2s;}
+.qb:hover{border-color:var(--red);transform:translateY(-1px);}
+.qb .qi{font-size:1.3rem;}
+.qb .ql{font-size:0.58rem;font-weight:700;color:var(--gray4);margin-top:3px;}
+.lwc{background:var(--white);border-radius:16px;margin:6px 16px 10px;padding:13px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,0.07);}
+.lwi{width:44px;height:44px;background:linear-gradient(135deg,var(--red),var(--orange));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.lwn{flex:1;}
+.lwn h4{font-size:0.88rem;font-weight:800;color:var(--dark);}
+.lwn p{font-size:0.68rem;color:var(--gray3);margin-top:2px;}
+.lwb{background:var(--dark);color:var(--white);border:none;border-radius:9px;padding:6px 12px;font-family:var(--font);font-size:0.7rem;font-weight:700;cursor:pointer;}
+/* log */
+.ltop{background:var(--dark);padding:13px 20px 11px;display:flex;align-items:center;justify-content:space-between;color:var(--white);}
+.ltop h2{font-size:0.98rem;font-weight:800;}
+.tp{background:rgba(231,76,60,0.18);color:var(--red);padding:5px 12px;border-radius:20px;font-size:0.76rem;font-weight:800;border:1px solid rgba(231,76,60,0.3);}
+.exc{background:var(--white);border-radius:16px;margin:10px 16px 0;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.07);}
+.exh{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.exd{width:10px;height:10px;border-radius:50%;background:var(--green);flex-shrink:0;}
+.exd.pen{background:var(--gray2);}
+.exn{font-size:0.9rem;font-weight:800;color:var(--dark);}
+.exw{font-size:0.7rem;color:var(--gray3);margin-left:auto;}
+.sr{display:flex;gap:6px;}
+.sb2{flex:1;padding:9px 4px;border-radius:10px;border:none;font-family:var(--font);font-size:0.7rem;font-weight:800;cursor:pointer;transition:all 0.15s;}
+.sb2.done{background:linear-gradient(135deg,var(--red),var(--orange));color:var(--white);}
+.sb2.nxt{background:linear-gradient(135deg,var(--red),var(--orange));color:var(--white);opacity:0.7;}
+.sb2.em{background:var(--gray1);color:var(--gray3);border:1.5px dashed var(--gray2);}
+.lp{background:var(--white);border-radius:16px;margin:10px 16px 0;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.07);}
+.lp h4{font-size:0.86rem;font-weight:800;color:var(--dark);margin-bottom:12px;}
+.ir{display:flex;gap:8px;margin-bottom:12px;}
+.ib{flex:1;background:var(--gray1);border:1.5px solid var(--gray2);border-radius:12px;padding:10px 12px;text-align:center;}
+.ibl{font-size:0.6rem;font-weight:700;color:var(--gray3);letter-spacing:0.5px;}
+.ibv{font-size:1.2rem;font-weight:900;color:var(--dark);}
+/* library */
+.libt{background:var(--dark);padding:15px 20px 17px;color:var(--white);}
+.libt h2{font-size:1.1rem;font-weight:800;margin-bottom:12px;}
+.sb3{background:rgba(255,255,255,0.09);border:1.5px solid rgba(255,255,255,0.13);border-radius:12px;padding:10px 16px;display:flex;align-items:center;gap:8px;color:var(--gray3);font-size:0.8rem;}
+.cr{display:flex;gap:6px;overflow-x:auto;padding:11px 16px 0;scrollbar-width:none;}
+.cr::-webkit-scrollbar{display:none;}
+.ch{padding:5px 13px;border-radius:20px;font-size:0.68rem;font-weight:700;white-space:nowrap;cursor:pointer;border:1.5px solid var(--gray2);background:var(--white);color:var(--gray4);transition:all 0.2s;}
+.ch.on{background:var(--red);border-color:var(--red);color:var(--white);}
+.er{background:var(--white);border-radius:16px;margin:8px 16px 0;padding:13px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.ei{width:44px;height:44px;background:var(--gray1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+.ein{flex:1;}
+.ein h4{font-size:0.86rem;font-weight:800;color:var(--dark);}
+.ein p{font-size:0.68rem;color:var(--gray3);margin-top:2px;}
+.ab{background:linear-gradient(135deg,var(--red),var(--orange));color:var(--white);border:none;border-radius:9px;padding:7px 13px;font-family:var(--font);font-size:0.7rem;font-weight:800;cursor:pointer;white-space:nowrap;}
+/* history */
+.ht{background:var(--dark);padding:15px 20px 18px;color:var(--white);}
+.ht h2{font-size:1.1rem;font-weight:800;margin-bottom:13px;}
+.cn{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;}
+.cn span{font-size:0.86rem;font-weight:700;}
+.cn button{background:none;border:none;color:var(--gray3);font-size:1rem;cursor:pointer;padding:3px 7px;}
+.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.cd{text-align:center;font-size:0.6rem;font-weight:700;color:var(--gray3);padding:2px 0;}
+.cn2{text-align:center;font-size:0.68rem;color:var(--white);padding:4px;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;margin:1px auto;cursor:pointer;}
+.cn2.w{background:var(--red);font-weight:800;}
+.cn2.t{border:2px solid var(--orange);font-weight:700;}
+.sc2{background:var(--white);border-radius:16px;margin:8px 16px 0;padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.si{width:40px;height:40px;background:linear-gradient(135deg,var(--red),var(--orange));border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+.sif h4{font-size:0.84rem;font-weight:800;color:var(--dark);}
+.sif p{font-size:0.68rem;color:var(--gray3);margin-top:2px;}
+/* progress */
+.pt{background:var(--dark);padding:14px 20px 10px;color:var(--white);}
+.pt h2{font-size:1.1rem;font-weight:800;}
+.prb{background:linear-gradient(135deg,var(--red),var(--orange));margin:13px 16px 0;border-radius:18px;padding:15px 17px;display:flex;align-items:center;gap:13px;color:var(--white);box-shadow:0 8px 24px rgba(231,76,60,0.35);animation:pIn 0.5s ease;}
+@keyframes pIn{from{transform:scale(0.97);opacity:0.8;}to{transform:scale(1);opacity:1;}}
+.pt2{font-size:2.1rem;}
+.px h3{font-size:0.98rem;font-weight:900;}
+.px p{font-size:0.74rem;opacity:0.88;margin-top:2px;}
+.px small{font-size:0.66rem;opacity:0.72;}
+.cc{background:var(--white);border-radius:16px;margin:10px 16px 0;padding:15px;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.ct{font-size:0.8rem;font-weight:800;color:var(--dark);margin-bottom:13px;}
+.bs{display:flex;align-items:flex-end;gap:5px;height:70px;}
+.bc{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.bar{width:100%;border-radius:5px 5px 0 0;}
+.bar.hi{background:linear-gradient(180deg,var(--red),var(--orange));}
+.bar.lo{background:#FFD0CC;}
+.bl{font-size:0.56rem;color:var(--gray3);}
+.pi{background:var(--white);border-radius:16px;margin:8px 16px 0;padding:13px 15px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.pe{flex:1;}
+.pe h4{font-size:0.84rem;font-weight:800;color:var(--dark);}
+.pe p{font-size:0.68rem;color:var(--gray3);}
+.pw{font-size:1.1rem;font-weight:900;color:var(--red);margin-right:7px;}
+.bg{background:#E8F5E9;color:var(--green);font-size:0.68rem;font-weight:800;padding:3px 9px;border-radius:8px;}
+/* social */
+.sot{background:var(--dark);padding:13px 20px 13px;color:var(--white);display:flex;align-items:center;justify-content:space-between;}
+.sot h2{font-size:1.1rem;font-weight:800;}
+.crb{background:linear-gradient(135deg,var(--red),var(--orange));color:var(--white);border:none;border-radius:10px;padding:7px 14px;font-family:var(--font);font-size:0.72rem;font-weight:800;cursor:pointer;}
+.gc{background:var(--white);border-radius:16px;margin:8px 16px 0;padding:13px;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.gt{display:flex;align-items:center;gap:12px;margin-bottom:9px;}
+.gi{width:46px;height:46px;background:#FFF0EE;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
+.gn h4{font-size:0.88rem;font-weight:800;color:var(--dark);}
+.gn p{font-size:0.68rem;color:var(--gray3);margin-top:2px;}
+.gp{font-size:0.7rem;font-weight:700;color:var(--green);}
+.pb{background:var(--gray1);border-radius:4px;height:5px;overflow:hidden;}
+.pbf{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--red),var(--orange));}
+.fi2{background:var(--white);border-radius:16px;margin:8px 16px 0;padding:11px 13px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.fa{width:36px;height:36px;border-radius:50%;background:#FFF0EE;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.fn{flex:1;}
+.fn h5{font-size:0.8rem;font-weight:800;color:var(--dark);}
+.fn p{font-size:0.68rem;color:var(--gray3);margin-top:1px;}
+.ft{font-size:0.62rem;color:var(--gray3);}
+/* settings */
+.sg{margin:0 16px;}
+.sgl{font-size:0.66rem;font-weight:800;color:var(--gray3);letter-spacing:1px;text-transform:uppercase;padding:14px 0 5px;}
+.srow{background:var(--white);padding:13px 15px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--gray1);cursor:pointer;transition:background 0.15s;}
+.srow:first-of-type{border-radius:14px 14px 0 0;}
+.srow:last-of-type{border-radius:0 0 14px 14px;border-bottom:none;}
+.srow:hover{background:var(--gray1);}
+.sico{font-size:1.2rem;width:30px;text-align:center;}
+.sinf{flex:1;}
+.sinf h4{font-size:0.84rem;font-weight:700;color:var(--dark);}
+.sinf p{font-size:0.68rem;color:var(--gray3);margin-top:1px;}
+.sar{color:var(--gray3);font-size:0.9rem;}
+.tog{width:44px;height:24px;background:var(--gray2);border-radius:12px;position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0;}
+.tog.on{background:var(--red);}
+.tog::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;background:white;border-radius:50%;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);}
+.tog.on::after{left:23px;}
+.avr{width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,var(--red),var(--orange));display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto;box-shadow:0 4px 16px rgba(231,76,60,0.35);}
+.pb2{background:var(--white);margin:0 16px;border-radius:16px;padding:18px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.07);}
+.pb2 h3{font-size:0.98rem;font-weight:800;color:var(--dark);margin-top:10px;}
+.pb2 p{font-size:0.72rem;color:var(--gray3);margin-top:3px;}
+.pb2 .eb{display:inline-block;margin-top:11px;padding:6px 18px;background:var(--gray1);border:1.5px solid var(--gray2);border-radius:10px;font-family:var(--font);font-size:0.74rem;font-weight:700;cursor:pointer;color:var(--dark);}
+/* help fab */
+.hfab{position:fixed;bottom:96px;right:22px;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--red),var(--orange));color:var(--white);border:none;font-size:1.3rem;cursor:pointer;box-shadow:0 4px 16px rgba(231,76,60,0.45);z-index:1000;transition:transform 0.2s;display:flex;align-items:center;justify-content:center;}
+.hfab:hover{transform:scale(1.08);}
+/* modal */
+.mov{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:2000;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);}
+.mov.open{display:flex;}
+.msh{background:var(--white);border-radius:24px 24px 0 0;width:100%;max-width:500px;max-height:82vh;overflow-y:auto;padding:22px 22px 40px;animation:su 0.3s ease;}
+@keyframes su{from{transform:translateY(60px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.mh{width:40px;height:4px;background:var(--gray2);border-radius:2px;margin:0 auto 18px;}
+.mt{font-size:1.1rem;font-weight:900;color:var(--dark);margin-bottom:4px;}
+.ms{font-size:0.76rem;color:var(--gray3);margin-bottom:18px;}
+.hi{display:flex;gap:13px;padding:13px 0;border-bottom:1px solid var(--gray1);}
+.hi:last-child{border-bottom:none;}
+.hn{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--red),var(--orange));color:var(--white);font-size:0.74rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.htx h4{font-size:0.84rem;font-weight:800;color:var(--dark);}
+.htx p{font-size:0.74rem;color:var(--gray3);margin-top:3px;line-height:1.55;}
+.cm{width:100%;margin-top:18px;padding:14px;background:var(--dark);color:var(--white);border:none;border-radius:14px;font-family:var(--font);font-size:0.88rem;font-weight:800;cursor:pointer;}
+/* pr overlay */
+.pro{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:4000;align-items:center;justify-content:center;flex-direction:column;text-align:center;}
+.pro.open{display:flex;animation:fi 0.3s ease;}
+@keyframes fi{from{opacity:0;}to{opacity:1;}}
+.prc{font-size:5rem;animation:bo 0.6s infinite alternate;}
+@keyframes bo{from{transform:scale(1);}to{transform:scale(1.15);}}
+.pro h2{font-size:1.8rem;font-weight:900;color:var(--white);margin-top:16px;}
+.pro p{color:var(--gray3);font-size:0.88rem;margin-top:8px;}
+.prcb{margin-top:26px;padding:13px 34px;background:linear-gradient(135deg,var(--red),var(--orange));color:var(--white);border:none;border-radius:14px;font-family:var(--font);font-size:0.9rem;font-weight:800;cursor:pointer;}
+/* toast */
+.toast{position:fixed;top:76px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--dark);color:var(--white);padding:10px 20px;border-radius:20px;font-size:0.78rem;font-weight:700;z-index:3000;transition:transform 0.3s;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,0.4);border-left:3px solid var(--red);}
+.toast.show{transform:translateX(-50%) translateY(0);}
+/* info panel */
+.ip{max-width:320px;width:100%;background:#161719;border-radius:20px;border:1px solid #2a2b30;padding:22px;align-self:flex-start;position:sticky;top:24px;}
+.ip h3{font-size:0.92rem;font-weight:800;margin-bottom:8px;background:linear-gradient(135deg,var(--red),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.ip p{font-size:0.76rem;color:var(--gray3);line-height:1.65;margin-bottom:12px;}
+.itag{display:inline-block;background:rgba(231,76,60,0.12);color:var(--red);font-size:0.66rem;font-weight:700;padding:3px 9px;border-radius:8px;margin:2px 2px 2px 0;}
+.ip hr{border:none;border-top:1px solid #2a2b30;margin:14px 0;}
+.itip{font-size:0.72rem;color:#555;line-height:1.6;}
+.itip strong{color:var(--gray3);}
+</style>
+</head>
+<body>
+<div class="site-header">
+  <div class="site-logo"><span>🏋️</span> FitTrack</div>
+  <div class="site-sub">Deliverable 3A — Interactive Prototype<br>CAP 4104 · FIU · Spring 2025</div>
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="go('login',this)">🔐 Login</button>
+  <button class="tab" onclick="go('onboarding',this)">👋 Onboarding</button>
+  <button class="tab" onclick="go('dashboard',this)">🏠 Dashboard</button>
+  <button class="tab" onclick="go('log',this)">💪 Log Workout</button>
+  <button class="tab" onclick="go('library',this)">📚 Library</button>
+  <button class="tab" onclick="go('history',this)">📅 History</button>
+  <button class="tab" onclick="go('progress',this)">📊 Progress</button>
+  <button class="tab" onclick="go('social',this)">👥 Social</button>
+  <button class="tab" onclick="go('settings',this)">⚙️ Settings</button>
+</div>
+<div class="layout">
+<div>
+<div class="phone">
+  <div class="sbar"><span>9:41</span><div class="notch"></div><span id="clk">●●● 100%</span></div>
+  <div class="swrap" id="sw">
+    <!-- LOGIN -->
+    <div class="screen active" id="s-login">
+      <div class="lbg"><div class="llogo">🏋️</div><h1>FitTrack</h1><p>Track smarter. Train harder.</p></div>
+      <div class="lform">
+        <div class="fmb"><div class="fl">EMAIL</div><input class="fi" type="email" placeholder="you@example.com"></div>
+        <div class="fmb"><div class="fl">PASSWORD</div><input class="fi" type="password" placeholder="••••••••"></div>
+        <div class="fgt">Forgot password?</div>
+      </div>
+      <button class="btnr" onclick="go('dashboard',null);toast('Welcome back! 👋')">Sign In →</button>
+      <div class="div">or</div>
+      <div class="socl">
+        <button class="sb" onclick="go('dashboard',null);toast('Signed in with Google!')">🌐 Google</button>
+        <button class="sb" onclick="go('dashboard',null);toast('Signed in with Apple!')">🍎 Apple</button>
+      </div>
+      <p class="noacc">New here? <a onclick="go('onboarding',null)">Create free account →</a></p>
+      <div style="height:16px;background:var(--gray1);"></div>
+    </div>
+    <!-- ONBOARDING -->
+    <div class="screen" id="s-onboarding">
+      <div class="obh"><div class="obico">🏋️</div><h1>FitTrack</h1><p>Your fitness journey starts here.</p></div>
+      <div class="obf">
+        <div class="fmb"><div class="fl">YOUR NAME</div><input class="fi" type="text" placeholder="Enter your name..."></div>
+        <div class="fmb"><div class="fl">FITNESS GOAL</div><input class="fi" type="text" placeholder="e.g. Build muscle, Lose weight..."></div>
+        <div class="fmb"><div class="fl">EXPERIENCE LEVEL</div><select class="fi"><option>Beginner — just starting out</option><option>Intermediate — some experience</option><option>Advanced — consistent trainer</option></select></div>
+      </div>
+      <div style="background:var(--gray1);padding:4px 0 12px;">
+        <button class="btnr" onclick="go('dashboard',null);toast('Profile created! Let\'s go 🔥')">Get Started →</button>
+        <p style="text-align:center;font-size:0.7rem;color:var(--gray3);margin-top:8px;">🔒 No account or email required</p>
+      </div>
+    </div>
+    <!-- DASHBOARD -->
+    <div class="screen" id="s-dashboard">
+      <div class="dtop">
+        <div class="dgr"><h2>Good morning, Sarah 👋</h2><p>Week 3 &nbsp;·&nbsp; 2 of 3 workouts done</p></div>
+        <div class="rrow">
+          <div class="rw">
+            <svg width="86" height="86" viewBox="0 0 86 86"><circle cx="43" cy="43" r="34" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8"/><circle cx="43" cy="43" r="34" fill="none" stroke="#E74C3C" stroke-width="8" stroke-dasharray="213" stroke-dashoffset="70" stroke-linecap="round"/></svg>
+            <div class="ri"><div class="rp">67%</div><div class="rs">Goal</div></div>
+          </div>
+          <div class="ss"><p>This week's progress</p><div class="sc"><div class="sch"><div class="sv">9</div><div class="sl2">Workouts</div></div><div class="sch"><div class="sv">47</div><div class="sl2">Exercises</div></div><div class="sch"><div class="sv">3</div><div class="sl2">PRs</div></div></div></div>
+        </div>
+      </div>
+      <div class="sl">Quick Actions</div>
+      <div class="qg">
+        <div class="qb" onclick="go('log',null)"><div class="qi">💪</div><div class="ql">Log</div></div>
+        <div class="qb" onclick="go('library',null)"><div class="qi">📚</div><div class="ql">Library</div></div>
+        <div class="qb" onclick="go('progress',null)"><div class="qi">📊</div><div class="ql">Progress</div></div>
+        <div class="qb" onclick="go('social',null)"><div class="qi">👥</div><div class="ql">Groups</div></div>
+      </div>
+      <div class="sl">Last Workout</div>
+      <div class="lwc"><div class="lwi">💪</div><div class="lwn"><h4>Upper Body</h4><p>Mon Mar 17 · 6 exercises · 45 min</p></div><button class="lwb" onclick="go('history',null)">View →</button></div>
+      <div style="height:12px;"></div>
+    </div>
+    <!-- LOG WORKOUT -->
+    <div class="screen" id="s-log">
+      <div class="ltop"><h2>💪 Today's Session</h2><div class="tp" id="td">⏱ 00:00:00</div></div>
+      <div class="exc"><div class="exh"><div class="exd"></div><span class="exn">Bench Press</span><span class="exw">135 lbs</span></div><div class="sr"><button class="sb2 done" onclick="toast('Set 1 logged ✓')">Set 1 ✓</button><button class="sb2 done" onclick="toast('Set 2 logged ✓')">Set 2 ✓</button><button class="sb2 nxt" onclick="logSet(this)">Set 3 →</button></div></div>
+      <div class="exc"><div class="exh"><div class="exd pen"></div><span class="exn">Squat</span><span class="exw">185 lbs</span></div><div class="sr"><button class="sb2 done" onclick="toast('Set 1 logged ✓')">Set 1 ✓</button><button class="sb2 em" onclick="logSet(this)">Set 2</button><button class="sb2 em" onclick="logSet(this)">Set 3</button></div></div>
+      <button class="btno" onclick="toast('Exercise added! 💪')">+ Add Exercise</button>
+      <div class="lp"><h4>Log Set</h4><div class="ir"><div class="ib"><div class="ibl">REPS</div><div class="ibv">10</div></div><div class="ib"><div class="ibl">WEIGHT (lbs)</div><div class="ibv">135</div></div></div><button class="btnr" onclick="toast('Set saved! 🎯')">✓ &nbsp;Save Set</button></div>
+      <button class="btnd" onclick="finishW()">■ &nbsp;Finish Workout</button>
+      <div style="height:8px;"></div>
+    </div>
+    <!-- LIBRARY -->
+    <div class="screen" id="s-library">
+      <div class="libt"><h2>📚 Exercise Library</h2><div class="sb3">🔍 &nbsp;Search exercises...</div></div>
+      <div class="cr"><div class="ch on" onclick="fc(this)">All</div><div class="ch" onclick="fc(this)">Chest</div><div class="ch" onclick="fc(this)">Back</div><div class="ch" onclick="fc(this)">Legs</div><div class="ch" onclick="fc(this)">Shoulders</div><div class="ch" onclick="fc(this)">Arms</div><div class="ch" onclick="fc(this)">Core</div></div>
+      <div style="height:8px;"></div>
+      <div class="er"><div class="ei">🏋️</div><div class="ein"><h4>Bench Press</h4><p>Chest · Beginner · 3 sets rec.</p></div><button class="ab" onclick="toast('Bench Press added! 💪')">+ Add</button></div>
+      <div class="er"><div class="ei">⬆️</div><div class="ein"><h4>Pull-Up</h4><p>Back · Intermediate · 3 sets rec.</p></div><button class="ab" onclick="toast('Pull-Up added! 💪')">+ Add</button></div>
+      <div class="er"><div class="ei">🦵</div><div class="ein"><h4>Squat</h4><p>Legs · Beginner · 4 sets rec.</p></div><button class="ab" onclick="toast('Squat added! 💪')">+ Add</button></div>
+      <div class="er"><div class="ei">💪</div><div class="ein"><h4>Shoulder Press</h4><p>Shoulders · Beginner · 3 sets rec.</p></div><button class="ab" onclick="toast('Shoulder Press added! 💪')">+ Add</button></div>
+      <div class="er"><div class="ei">🔄</div><div class="ein"><h4>Deadlift</h4><p>Back/Legs · Intermediate · 3 sets rec.</p></div><button class="ab" onclick="toast('Deadlift added! 💪')">+ Add</button></div>
+      <div class="er"><div class="ei">🤸</div><div class="ein"><h4>Dumbbell Curl</h4><p>Arms · Beginner · 3 sets rec.</p></div><button class="ab" onclick="toast('Curl added! 💪')">+ Add</button></div>
+      <div style="height:12px;"></div>
+    </div>
+    <!-- HISTORY -->
+    <div class="screen" id="s-history">
+      <div class="ht"><h2>📅 Workout History</h2><div class="cn"><button>◀</button><span>March 2025</span><button>▶</button></div>
+      <div class="cg">
+        <div class="cd">Su</div><div class="cd">Mo</div><div class="cd">Tu</div><div class="cd">We</div><div class="cd">Th</div><div class="cd">Fr</div><div class="cd">Sa</div>
+        <div class="cn2"></div><div class="cn2"></div><div class="cn2"></div><div class="cn2"></div><div class="cn2"></div><div class="cn2"></div><div class="cn2 w">1</div>
+        <div class="cn2"></div><div class="cn2"></div><div class="cn2 w">3</div><div class="cn2"></div><div class="cn2 w">5</div><div class="cn2"></div><div class="cn2"></div>
+        <div class="cn2 w">7</div><div class="cn2"></div><div class="cn2"></div><div class="cn2 w">10</div><div class="cn2"></div><div class="cn2"></div><div class="cn2"></div>
+        <div class="cn2"></div><div class="cn2 w">12</div><div class="cn2"></div><div class="cn2 w">14</div><div class="cn2"></div><div class="cn2"></div><div class="cn2"></div>
+        <div class="cn2 w">17</div><div class="cn2"></div><div class="cn2"></div><div class="cn2 w">19</div><div class="cn2"></div><div class="cn2 w">21</div><div class="cn2"></div>
+        <div class="cn2 w">24</div><div class="cn2 t">25</div><div class="cn2"></div><div class="cn2"></div><div class="cn2"></div><div class="cn2"></div><div class="cn2"></div>
+        <div class="cn2"></div><div class="cn2"></div><div class="cn2"></div><div class="cn2"></div><div class="cn2"></div><div class="cn2"></div>
+      </div></div>
+      <div class="sl">Recent Sessions</div>
+      <div class="sc2"><div class="si">💪</div><div class="sif"><h4>Upper Body</h4><p>Mon Mar 24 · 6 exercises · 45 min</p></div></div>
+      <div class="sc2"><div class="si">🦵</div><div class="sif"><h4>Leg Day</h4><p>Sat Mar 22 · 5 exercises · 50 min</p></div></div>
+      <div class="sc2"><div class="si">💪</div><div class="sif"><h4>Push Day</h4><p>Thu Mar 20 · 7 exercises · 55 min</p></div></div>
+      <div class="sc2"><div class="si">🔄</div><div class="sif"><h4>Full Body</h4><p>Mon Mar 17 · 8 exercises · 60 min</p></div></div>
+      <div style="height:12px;"></div>
+    </div>
+    <!-- PROGRESS -->
+    <div class="screen" id="s-progress">
+      <div class="pt"><h2>📊 Progress & PRs</h2></div>
+      <div class="prb"><div class="pt2">🏆</div><div class="px"><h3>New Personal Record!</h3><p>Bench Press · 135 lbs</p><small>+10 lbs from last PR · 3 weeks ago</small></div></div>
+      <div class="cc"><div class="ct">Strength Progress — Bench Press</div><div class="bs"><div class="bc"><div class="bar lo" style="height:28px"></div><div class="bl">W1</div></div><div class="bc"><div class="bar lo" style="height:36px"></div><div class="bl">W2</div></div><div class="bc"><div class="bar lo" style="height:42px"></div><div class="bl">W3</div></div><div class="bc"><div class="bar lo" style="height:48px"></div><div class="bl">W4</div></div><div class="bc"><div class="bar lo" style="height:53px"></div><div class="bl">W5</div></div><div class="bc"><div class="bar lo" style="height:58px"></div><div class="bl">W6</div></div><div class="bc"><div class="bar lo" style="height:64px"></div><div class="bl">W7</div></div><div class="bc"><div class="bar hi" style="height:72px"></div><div class="bl">W8</div></div></div></div>
+      <div class="sl">Personal Records</div>
+      <div class="pi"><div class="pe"><h4>🏋️ Bench Press</h4><p>Last set 3 weeks ago</p></div><span class="pw">135 lbs</span><span class="bg">+10 lbs</span></div>
+      <div class="pi"><div class="pe"><h4>🦵 Squat</h4><p>Last set 1 week ago</p></div><span class="pw">185 lbs</span><span class="bg">+15 lbs</span></div>
+      <div class="pi"><div class="pe"><h4>🔄 Deadlift</h4><p>Last set 2 weeks ago</p></div><span class="pw">225 lbs</span><span class="bg">+20 lbs</span></div>
+      <div class="pi"><div class="pe"><h4>💪 Shoulder Press</h4><p>Last set 4 days ago</p></div><span class="pw">95 lbs</span><span class="bg">+5 lbs</span></div>
+      <div style="height:12px;"></div>
+    </div>
+    <!-- SOCIAL -->
+    <div class="screen" id="s-social">
+      <div class="sot"><h2>👥 Social Groups</h2><button class="crb" onclick="toast('Group creation coming soon!')">+ Create</button></div>
+      <div class="sl">My Groups</div>
+      <div class="gc"><div class="gt"><div class="gi">🏋️</div><div class="gn"><h4>FIU Lifters</h4><p>4 members</p><p class="gp">3 of 4 workouts done</p></div></div><div class="pb"><div class="pbf" style="width:75%"></div></div></div>
+      <div class="gc"><div class="gt"><div class="gi">🏃</div><div class="gn"><h4>Morning Runners</h4><p>6 members</p><p class="gp">5 of 6 goals completed</p></div></div><div class="pb"><div class="pbf" style="width:83%"></div></div></div>
+      <div class="sl">Friends Activity</div>
+      <div class="fi2"><div class="fa">💪</div><div class="fn"><h5>Marcus T.</h5><p>Logged Upper Body · 6 sets</p></div><div class="ft">2h ago</div></div>
+      <div class="fi2"><div class="fa">🏆</div><div class="fn"><h5>Sofia R.</h5><p>New PR! Squat — 135 lbs 🎉</p></div><div class="ft">5h ago</div></div>
+      <div class="fi2"><div class="fa">👥</div><div class="fn"><h5>Devon K.</h5><p>Created FIU Lifters group</p></div><div class="ft">1d ago</div></div>
+      <div style="height:12px;"></div>
+    </div>
+    <!-- SETTINGS -->
+    <div class="screen" id="s-settings">
+      <div class="dh"><h2>⚙️ Settings</h2></div>
+      <div style="background:var(--gray1);padding:14px 16px 0;">
+        <div class="pb2"><div class="avr">🏋️</div><h3>Sarah M.</h3><p>Beginner · Goal: Build muscle</p><button class="eb" onclick="toast('Profile editor coming soon!')">Edit Profile</button></div>
+      </div>
+      <div style="background:var(--gray1);padding:0 0 8px;">
+        <div class="sg">
+          <div class="sgl">Preferences</div>
+          <div class="srow" onclick="tog(this)"><div class="sico">🔔</div><div class="sinf"><h4>Notifications</h4><p>Workout reminders & PR alerts</p></div><div class="tog on"></div></div>
+          <div class="srow" onclick="tog(this)"><div class="sico">🌙</div><div class="sinf"><h4>Dark Mode</h4><p>Easy on the eyes at the gym</p></div><div class="tog on"></div></div>
+          <div class="srow" onclick="tog(this)"><div class="sico">🔒</div><div class="sinf"><h4>Private Profile</h4><p>Only friends can see your PRs</p></div><div class="tog"></div></div>
+          <div class="sgl">Units & Display</div>
+          <div class="srow" onclick="toast('Units updated!')"><div class="sico">⚖️</div><div class="sinf"><h4>Weight Units</h4><p>Currently: lbs</p></div><div class="sar">›</div></div>
+          <div class="srow" onclick="toast('Rest timer updated!')"><div class="sico">⏱</div><div class="sinf"><h4>Rest Timer</h4><p>90 seconds between sets</p></div><div class="sar">›</div></div>
+          <div class="sgl">Account</div>
+          <div class="srow" onclick="toast('Opening privacy settings...')"><div class="sico">🛡️</div><div class="sinf"><h4>Privacy & Data</h4><p>Manage your data</p></div><div class="sar">›</div></div>
+          <div class="srow" onclick="go('login',null);toast('Signed out. See you tomorrow! 👋')"><div class="sico">🚪</div><div class="sinf"><h4>Sign Out</h4><p>Come back soon!</p></div><div class="sar">›</div></div>
+        </div>
+      </div>
+      <div style="height:16px;background:var(--gray1);"></div>
+    </div>
+  </div>
+  <!-- bottom nav -->
+  <div class="bnav">
+    <button class="nbtn" onclick="go('dashboard',null)"><span class="ni">🏠</span><span class="nl">Home</span></button>
+    <button class="nbtn" onclick="go('log',null)"><span class="ni">💪</span><span class="nl">Log</span></button>
+    <button class="nbtn" onclick="go('library',null)"><span class="ni">📚</span><span class="nl">Library</span></button>
+    <button class="nbtn" onclick="go('progress',null)"><span class="ni">📊</span><span class="nl">Progress</span></button>
+    <button class="nbtn" onclick="go('social',null)"><span class="ni">👥</span><span class="nl">Social</span></button>
+  </div>
+</div>
+</div>
+<!-- info panel -->
+<div class="ip">
+  <h3 id="ipt">🔐 Login Screen</h3>
+  <p id="ipd">Entry point for returning users. Supports email/password and Google/Apple social sign-in. New users are directed to Onboarding. Required shell screen per rubric.</p>
+  <div id="iptags"><span class="itag">Shell screen</span><span class="itag">Email login</span><span class="itag">Social auth</span></div>
+  <hr>
+  <p class="itip" id="iptip"><strong>Try it:</strong> Click "Sign In" to go to the Dashboard, or "Create free account" to go to Onboarding.</p>
+</div>
+</div>
+
+<!-- HELP FAB -->
+<button class="hfab" onclick="openH()">❓</button>
+
+<!-- HELP MODAL -->
+<div class="mov" id="hmod" onclick="closeH(event)">
+  <div class="msh">
+    <div class="mh"></div>
+    <div class="mt">FitTrack Help Center</div>
+    <div class="ms">Everything you need to get started</div>
+    <div class="hi"><div class="hn">1</div><div class="htx"><h4>Logging a Workout</h4><p>Go to Log → tap an exercise → use the Set Logger to enter reps and weight → Save Set → repeat → tap Finish Workout when done.</p></div></div>
+    <div class="hi"><div class="hn">2</div><div class="htx"><h4>Finding Exercises</h4><p>Go to Library → search or tap a muscle group filter → tap "+ Add" on any exercise to add it to your active session.</p></div></div>
+    <div class="hi"><div class="hn">3</div><div class="htx"><h4>Tracking Personal Records</h4><p>PRs are detected automatically when you log a heavier set than your previous best. A gold trophy banner fires on the Progress screen.</p></div></div>
+    <div class="hi"><div class="hn">4</div><div class="htx"><h4>Viewing Your History</h4><p>Go to History → the calendar highlights all workout days in red. Tap any session card to view full session details.</p></div></div>
+    <div class="hi"><div class="hn">5</div><div class="htx"><h4>Joining a Fitness Group</h4><p>Go to Social → tap "+ Create" to start a group or browse existing ones. The feed shows everyone's workouts and PRs in real time.</p></div></div>
+    <div class="hi"><div class="hn">6</div><div class="htx"><h4>Changing Preferences</h4><p>Go to Settings → toggle notifications, dark mode, privacy settings, weight units, and rest timer duration.</p></div></div>
+    <button class="cm" onclick="closeH()">Got it — close help</button>
+  </div>
+</div>
+
+<!-- PR CELEBRATION -->
+<div class="pro" id="prod">
+  <div class="prc">🏆</div>
+  <h2>New Personal Record!</h2>
+  <p>Bench Press · 135 lbs · +10 lbs from last PR</p>
+  <button class="prcb" onclick="closePR();go('progress',null)">View My PRs →</button>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="tst"></div>
+
+<script>
+const SD={
+  login:{t:'🔐 Login Screen',d:'Entry point for returning users. Supports email/password and Google/Apple social sign-in. New users are routed to Onboarding. This is a required shell screen per the rubric.',tags:['Shell screen','Email login','Social auth','Password recovery'],tip:'Click "Sign In" to go to Dashboard, or "Create free account" to go to Onboarding.'},
+  onboarding:{t:'👋 Onboarding',d:'First-time user setup. Three simple fields: Name, Fitness Goal, and Experience Level. No account or email required — directly addressing Adam\'s frustration with complex sign-ups.',tags:['No account needed','3 fields','Single CTA','Shell screen'],tip:'Fill in the fields and tap "Get Started" to create your profile.'},
+  dashboard:{t:'🏠 Home Dashboard',d:'Central hub showing weekly goal ring, stat chips, quick action buttons, and the last workout card. Users return here after every session.',tags:['Progress ring','Weekly stats','Quick actions','Last session'],tip:'Click the Quick Action buttons to navigate to any feature instantly.'},
+  log:{t:'💪 Log Workout',d:'Core feature. Live session timer, exercise cards with set tracking, and a Set Logger panel. Finish Workout triggers the PR celebration before saving.',tags:['Live timer','Set tracking','Quick log','PR detection'],tip:'Tap set buttons to mark them done. Tap "Finish Workout" to trigger a PR celebration!'},
+  library:{t:'📚 Exercise Library',d:'Built-in fitness coach. Search bar, muscle group filter chips, and exercise cards with one-tap Add. Directly addresses Sarah\'s need to know what to do before the gym.',tags:['Search','Muscle filters','One-tap add','Beginner-friendly'],tip:'Tap the filter chips to sort by muscle group. Tap "+ Add" to add to your session.'},
+  history:{t:'📅 Workout History',d:'Calendar view with red dots marking workout days. Session list shows all recent workouts with type, date, and duration.',tags:['Calendar view','Workout dots','Session list','Consistency tracking'],tip:'The red circles mark every day you completed a workout this month.'},
+  progress:{t:'📊 Progress & PRs',d:'Trophy Case metaphor. PR banner, 8-week strength chart, and personal records list with green gain badges.',tags:['PR banner','Progress chart','PR list','Gain badges'],tip:'The gold PR banner auto-appears when you beat your previous best weight.'},
+  social:{t:'👥 Social Groups',d:'Community layer with group cards, shared goal progress bars, and a friends activity feed showing PRs and workouts in real time.',tags:['Group creation','Shared goals','Progress bars','Friends feed'],tip:'Progress bars fill based on how many members hit their weekly goal.'},
+  settings:{t:'⚙️ Settings & Preferences',d:'User preferences shell screen. Profile card, notification toggles, dark mode, privacy, weight units, rest timer, and sign out.',tags:['Shell screen','User preferences','Toggles','Sign out'],tip:'Tap any toggle to switch it. Tap "Sign Out" to return to Login.'},
+};
+
+function go(id,tabEl){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById('s-'+id);
+  if(el)el.classList.add('active');
+  document.getElementById('sw').scrollTop=0;
+  if(tabEl){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));tabEl.classList.add('active');}
+  else{document.querySelectorAll('.tab').forEach(t=>{if(t.getAttribute('onclick').includes("'"+id+"'")){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');}});}
+  const d=SD[id]||{};
+  document.getElementById('ipt').textContent=d.t||'';
+  document.getElementById('ipd').textContent=d.d||'';
+  document.getElementById('iptags').innerHTML=(d.tags||[]).map(t=>`<span class="itag">${t}</span>`).join('');
+  document.getElementById('iptip').innerHTML=`<strong>Try it:</strong> ${d.tip||''}`;
+  document.querySelector('.bnav').style.visibility=['login','onboarding'].includes(id)?'hidden':'visible';
+  if(id==='log'&&!timerRunning)startTimer();
+}
+
+let timerRunning=false,timerSecs=0,timerInt;
+function startTimer(){timerRunning=true;timerInt=setInterval(()=>{timerSecs++;const h=String(Math.floor(timerSecs/3600)).padStart(2,'0'),m=String(Math.floor((timerSecs%3600)/60)).padStart(2,'0'),s=String(timerSecs%60).padStart(2,'0');document.getElementById('td').textContent=`⏱ ${h}:${m}:${s}`;},1000);}
+
+function logSet(btn){btn.classList.remove('em','nxt');btn.classList.add('done');btn.textContent=btn.textContent.replace('→','✓');toast('Set logged! 🎯');}
+
+function finishW(){clearInterval(timerInt);timerRunning=false;timerSecs=0;document.getElementById('td').textContent='⏱ 00:00:00';document.getElementById('prod').classList.add('open');}
+function closePR(){document.getElementById('prod').classList.remove('open');}
+
+function fc(el){document.querySelectorAll('.ch').forEach(c=>c.classList.remove('on'));el.classList.add('on');}
+
+function tog(row){const t=row.querySelector('.tog');if(t){t.classList.toggle('on');toast(t.classList.contains('on')?'Setting enabled ✓':'Setting disabled');}}
+
+function openH(){document.getElementById('hmod').classList.add('open');}
+function closeH(e){if(!e||e.target===document.getElementById('hmod'))document.getElementById('hmod').classList.remove('open');}
+
+let tt;
+function toast(msg){const t=document.getElementById('tst');t.textContent=msg;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2500);}
+
+function updateClk(){const n=new Date();document.getElementById('clk').textContent=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;}
+updateClk();setInterval(updateClk,30000);
+</script>
+</body>
+</html>
